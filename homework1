@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course Grades</title>
+    <style>
+        /* تخصيص الألوان هنا */
+        body {
+            background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            color: #333333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #dddddd;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            color: #333333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        label {
+            font-weight: bold;
+            color: #333333;
+        }
+
+        input[type="number"], input[type="text"] {
+            padding: 6px;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<html>
+<head>
+    <title>Course Grades</title>
+</head>
+<body>
+    <?php
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['num_of_courses'])) {
+        echo "<h2>Grades</h2>";
+        echo "<table>";
+        echo "<tr><th>Course</th><th>Mark</th><th>Grade</th></tr>";
+
+        for ($i = 1; $i <= $_POST['num_of_courses']; $i++) {
+            $course_name = isset($_POST['course_name_' . $i]) ? $_POST['course_name_' . $i] : '';
+            $test1 = isset($_POST['test1_' . $i]) ? $_POST['test1_' . $i] : 0;
+            $test2 = isset($_POST['test2_' . $i]) ? $_POST['test2_' . $i] : 0;
+            $final_exam = isset($_POST['final_exam_' . $i]) ? $_POST['final_exam_' . $i] : 0;
+
+            $course = new Course($course_name, $test1, $test2, $final_exam);
+            $mark = $course->calculateMark();
+            $grade = $course->calculateGrade();
+
+            echo "<tr>";
+            echo "<td>" . $course_name . "</td>";
+            echo "<td>" . $mark . "</td>";
+            echo "<td>" . $grade . "</td>";
+            echo "</tr>";
+        }
+
+        echo "</table>";
+    }
+    ?>
+
+    <form method="POST" action="lap100.php">
+        <label for="num_of_courses">Enter the number of courses:</label>
+        <input type="number" name="num_of_courses" id="num_of_courses" required><br><br>
+        <?php if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['num_of_courses'])): ?>
+            <?php for ($i = 1; $i <= $_POST['num_of_courses']; $i++): ?>
+                <label for="course_name_<?php echo $i; ?>">Enter the name of course <?php echo $i; ?>:</label>
+                <input type="text" name="course_name_<?php echo $i; ?>" required><br><br>
+                <label for="test1_<?php echo $i; ?>">Enter the first test score:</label>
+                <input type="number" name="test1_<?php echo $i; ?>" required><br><br>
+                <label for="test2_<?php echo $i; ?>">Enter the second test score:</label>
+                <input type="number" name="test2_<?php echo $i; ?>" required><br><br>
+                <label for="final_exam_<?php echo $i; ?>">Enter the final exam score:</label>
+                <input type="number" name="final_exam_<?php echo $i; ?>" required><br><br>
+            <?php endfor; ?>
+            <input type="submit" value="Calculate Grades">
+        <?php endif; ?>
+    </form>
+
+    <?php
+    class Course
+    {
+        public $course_name;
+        public $test1;
+        public $test2;
+        public $final_exam;
+
+        public function __construct($course_name, $test1, $test2, $final_exam)
+        {
+            $this->course_name = $course_name;
+            $this->test1 = $test1;
+            $this->test2 = $test2;
+            $this->final_exam = $final_exam;
+        }
+
+        public function calculateMark()
+        {
+            return (float)$this->test1 + (float)$this->test2 + (float)$this->final_exam;
+        }
+
+        public function calculateGrade()
+        {
+            $mark = $this->calculateMark();
+            if ($mark >= 90) {
+                return 'A';
+            } else if ($mark >= 80) {
+                return 'B';
+            } else if ($mark >= 70) {
+                return 'C';
+            } else if ($mark >= 60) {
+                return 'D';
+            } else {
+                return 'F';
+            }
+        }
+    }
+    ?>
+
+</body>
+</html>
